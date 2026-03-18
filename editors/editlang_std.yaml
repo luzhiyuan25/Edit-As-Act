@@ -1,0 +1,270 @@
+# editors/editlang_std.yaml
+
+predicates:
+  # 1. Existence
+  - exists
+  - removed
+
+  # 2. Spatial Relations
+  - at              # args: [o, x, y, z]
+  - "on"            # args: [o, surface]
+  - between         # args: [o, a, b]
+  - near            # args: [o, target, tau]
+  - aligned_with    # args: [o, target, axis]
+
+  # 3. Directional & Relative
+  - is_facing       # args: [o, target]
+  - left_of         # args: [o, ref, view]
+  - right_of        # args: [o, ref, view]
+  - in_front_of     # args: [o, ref]
+  - behind          # args: [o, ref]
+
+  # 4. Grouping & Constraints
+  - grouped_with    # args: [child, parent]
+  - locked          # args: [o]
+
+  # 5. Physical & Functional
+  - supported       # args: [o, surface]
+  - contact         # args: [o, surface]
+  - clear           # args: [o]
+  - stable          # args: [o]
+  - colliding       # args: [o1, o2]
+  - visible         # args: [o, view]
+  - accessible      # args: [o]
+
+  # 6. Attributes
+  - has_style       # args: [o, desc]
+  - matches_style   # args: [o1, o2]
+  - has_scale       # args: [o, sx, sy, sz]
+
+actions:
+  move_to:
+    name: move_to
+    args:
+      obj: "?obj"
+      pos: "?pos"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+    add:
+      - pred: at
+        args: ["?obj", "?pos"]
+    dele:
+      - pred: at
+        args: ["?obj", "?any_pos"]
+      - pred: "on"
+        args: ["?obj", "?any_surf"]
+      - pred: near
+        args: ["?obj", "?any_target", "?any_dist"]
+      - pred: aligned_with
+        args: ["?obj", "?any_ref", "?any_axis"]
+      - pred: left_of
+        args: ["?obj", "?any_ref", "?any_view"]
+      - pred: right_of
+        args: ["?obj", "?any_ref", "?any_view"]
+      - pred: in_front_of
+        args: ["?obj", "?any_ref"]
+      - pred: behind
+        args: ["?obj", "?any_ref"]
+
+  move_group:
+    name: move_group
+    args:
+      parent: "?parent"
+      pos: "?pos"
+    pre:
+      - pred: exists
+        args: ["?parent"]
+    add:
+      - pred: at
+        args: ["?parent", "?pos"]
+    dele:
+      - pred: at
+        args: ["?parent", "?any_pos"]
+
+  place_relative:
+    name: place_relative
+    args:
+      obj: "?obj"
+      target: "?target"
+      relation: "?relation" # e.g., 'left_of', 'right_of', 'near', 'in_front_of', 'behind'
+    pre:
+      - pred: exists
+        args: ["?obj"]
+      - pred: exists
+        args: ["?target"]
+    add:
+      - pred: near
+        args: ["?obj", "?target", "default"]
+      - pred: "?relation"
+        args: ["?obj", "?target"]
+    dele:
+      - pred: at
+        args: ["?obj", "?any_pos"]
+      - pred: near
+        args: ["?obj", "?any_target", "?any_dist"]
+      - pred: left_of
+        args: ["?obj", "?any_ref", "?any_view"]
+      - pred: right_of
+        args: ["?obj", "?any_ref", "?any_view"]
+      - pred: in_front_of
+        args: ["?obj", "?any_ref"]
+      - pred: behind
+        args: ["?obj", "?any_ref"]
+
+  place_on:
+    name: place_on
+    args:
+      obj: "?obj"
+      surface: "?surface"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+      - pred: exists
+        args: ["?surface"]
+    add:
+      - pred: "on"
+        args: ["?obj", "?surface"]
+      - pred: supported
+        args: ["?obj", "?surface"]
+    dele:
+      - pred: at
+        args: ["?obj", "?any_pos"]
+      - pred: "on"
+        args: ["?obj", "?any_surf"]
+
+  align_with:
+    name: align_with
+    args:
+      obj: "?obj"
+      target: "?target"
+      axis: "?axis"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+      - pred: exists
+        args: ["?target"]
+    add:
+      - pred: aligned_with
+        args: ["?obj", "?target", "?axis"]
+    dele: []
+
+  # --- Orientation & Scale ---
+  rotate_towards:
+    name: rotate_towards
+    args:
+      obj: "?obj"
+      target: "?target"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+      - pred: exists
+        args: ["?target"]
+    add:
+      - pred: is_facing
+        args: ["?obj", "?target"]
+    dele:
+      - pred: is_facing
+        args: ["?obj", "?any_target"]
+
+  rotate_by:
+    name: rotate_by
+    args:
+      obj: "?obj"
+      degrees: "?degrees"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+    add: []
+    dele: 
+      - pred: is_facing
+        args: ["?obj", "?any_target"]
+
+  scale:
+    name: scale
+    args:
+      obj: "?obj"
+      sx: "?sx"
+      sy: "?sy"
+      sz: "?sz"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+    add:
+      - pred: has_scale
+        args: ["?obj", "?sx", "?sy", "?sz"]
+    dele:
+      - pred: has_scale
+        args: ["?obj", "?any_sx", "?any_sy", "?any_sz"]
+
+  place_between:
+    name: place_between
+    args:
+      obj: "?obj"
+      obj1: "?obj1"
+      obj2: "?obj2"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+      - pred: exists
+        args: ["?obj1"]
+      - pred: exists
+        args: ["?obj2"]
+    add:
+      - pred: between
+        args: ["?obj", "?obj1", "?obj2"]
+    dele:
+      - pred: at
+        args: ["?obj", "?any_pos"]
+      - pred: between
+        args: ["?obj", "?any_a", "?any_b"]
+
+  # --- Creation, Deletion & Style ---
+  add_object:
+    name: add_object
+    args:
+      obj: "?obj"
+      cat: "?cat"
+      support: "?support"
+    pre:
+      - pred: exists
+        args: ["?support"]
+    add:
+      - pred: exists
+        args: ["?obj"]
+      - pred: "on"
+        args: ["?obj", "?support"]
+    dele: []
+
+  remove_object:
+    name: remove_object
+    args:
+      obj: "?obj"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+    add:
+      - pred: removed
+        args: ["?obj"]
+    dele:
+      - pred: exists
+        args: ["?obj"]
+      - pred: "on"
+        args: ["?obj", "?any_surf"]
+      - pred: at
+        args: ["?obj", "?any_pos"]
+
+  stylize:
+    name: stylize
+    args:
+      obj: "?obj"
+      desc: "?desc"
+    pre:
+      - pred: exists
+        args: ["?obj"]
+    add:
+      - pred: has_style
+        args: ["?obj", "?desc"]
+    dele:
+      - pred: has_style
+        args: ["?obj", "?any_desc"]

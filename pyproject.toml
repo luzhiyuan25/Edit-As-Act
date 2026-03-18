@@ -1,0 +1,14 @@
+[project]
+name = "edit-as-act"
+version = "0.1.0"
+description = "Goal-regressive planning for open-vocabulary 3D indoor scene editing"
+readme = "code/README.md"
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "openai==2.15.0",
+    "PyYAML==6.0.3",
+    "tqdm==4.67.1",
+]
+
+[tool.uv]
+package = false
