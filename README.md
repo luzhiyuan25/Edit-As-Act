@@ -85,6 +85,8 @@ code/dataset/dataset/bedroom/plans_applied/scene_layout_instruction_1_add.json
 - [x] Dataset
 - [x] Model
 - [ ] Visualization code 
+
+
 The visualization code will be released by ~ 3/28
 
 ## BibTeX
